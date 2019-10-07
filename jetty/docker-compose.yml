@@ -1,0 +1,19 @@
+---
+version: '3.1'
+
+services:
+
+  jetty:
+    image: jetty
+    restart: always
+    container_name: jetty
+    ports:
+      - 8080:8080
+      - 8443:8443
+    volumes:
+      - /var/lib/jetty/webapps/:/home/thawes/programs/share/jetty/
+    networks:
+      bridge:
+
+networks:
+  bridge:
