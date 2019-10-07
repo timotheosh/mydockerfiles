@@ -1,0 +1,18 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  postgres:
+    image: postgres:9
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    container_name: postgres
+    ports:
+      - 5432:5432
+    networks:
+      bridge:
+
+networks:
+  bridge:
