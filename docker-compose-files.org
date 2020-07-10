@@ -1,0 +1,214 @@
+#+TITLE: Docker Compose Files
+#+author: Tim Hawes
+#+property: header-args :tangle yes :mkdirp yes
+
+* Distro Files
+** MIT License
+#+BEGIN_SRC fundamental :tangle LICENSE
+MIT License
+
+Copyright (c) 2019 Tim Hawes
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+#+END_SRC
+** README
+#+BEGIN_SRC org :tangle README.org
+'* docker-compose-files
+A place to store my docker-compose files
+#+END_SRC
+
+* Servers
+** Amazon SQS
+#+BEGIN_SRC yaml :tangle amazon-sqs/docker-compose.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  amazon-sqs:
+    image: vsouza/sqs-local
+    restart: always
+    container_name: sqs-local
+    ports:
+      - 9324:9324
+    networks:
+      bridge:
+
+networks:
+  bridge:
+
+#+END_SRC
+** Amazon DynamoDB
+#+BEGIN_SRC yaml :tangle dynamodb/docker-compose.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    restart: always
+    container_name: dynamodb-local
+    ports:
+      - 8000:8000
+    networks:
+      bridge:
+
+networks:
+  bridge:
+
+#+END_SRC
+** Exercism Test Suite
+*** Common Lisp
+#+BEGIN_SRC Dockerfile :tangle exercism/common-lisp/Dockerfile
+FROM ubuntu:18.04
+RUN apt-get update && apt-get -y install build-essential gcc git make autoconf automake libcurl4-openssl-dev libz-dev
+RUN cd /usr/local/src/ && \
+    git clone https://github.com/roswell/roswell.git && \
+    cd roswell && \
+    git checkout v20.01.14.104 && \
+    ./bootstrap && \
+    ./configure && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf roswell
+RUN useradd -s /bin/bash -m roswell
+USER roswell
+WORKDIR /home/roswell
+RUN ros init
+RUN ros install sbcl/2.0.1
+RUN ros install lisp-unit lisp-unit2 rove cl-ppcre
+
+#+END_SRC
+** Jetty
+#+BEGIN_SRC yaml :tangle jetty/docker-compose.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+version: '3.1'
+
+services:
+
+  jetty:
+    image: jetty
+    restart: always
+    container_name: jetty
+    ports:
+      - 8080:8080
+      - 8443:8443
+    volumes:
+            - /home/thawes/programs/share/jetty/:/var/lib/jetty/webapps/
+    networks:
+      bridge:
+
+networks:
+  bridge:
+
+#+END_SRC
+** PostgreSQL
+#+BEGIN_SRC yaml :tangle postgres/docker-compose.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  postgres:
+    image: postgres:10
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    container_name: postgres
+    ports:
+      - 5432:5432
+    networks:
+      bridge:
+
+networks:
+  bridge:
+
+#+END_SRC
+** Redis
+#+BEGIN_SRC yaml :tangle redis/docker-compose.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+version: '3.1'
+
+services:
+  redis:
+    image: redis:5
+    restart: always
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      bridge:
+
+networks:
+  bridge:
+
+#+END_SRC
+** Samba
+#+BEGIN_SRC yaml :tangle samba/docker-compose.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+
+#+END_SRC
+** Wordpress
+#+BEGIN_SRC yaml :tangle wordpress/stack.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
+
+#+END_SRC
