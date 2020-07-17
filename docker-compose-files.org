@@ -80,7 +80,7 @@ networks:
 #+END_SRC
 ** Exercism Test Suite
 *** Common Lisp
-#+BEGIN_SRC Dockerfile :tangle exercism/common-lisp/Dockerfile
+#+BEGIN_SRC Dockerfile :tangle output/dockerfiles/exercism/common-lisp/Dockerfile
 FROM ubuntu:18.04
 RUN apt-get update && apt-get -y install build-essential gcc git make autoconf automake libcurl4-openssl-dev libz-dev
 RUN cd /usr/local/src/ && \
