@@ -35,7 +35,7 @@ A place to store my docker-compose files
 
 * Servers
 ** Amazon SQS
-#+BEGIN_SRC yaml :tangle amazon-sqs/docker-compose.yml
+#+BEGIN_SRC yaml :tangle output/amazon-sqs.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
 ---
 # Use postgres/example user/password credentials
@@ -57,7 +57,7 @@ networks:
 
 #+END_SRC
 ** Amazon DynamoDB
-#+BEGIN_SRC yaml :tangle dynamodb/docker-compose.yml
+#+BEGIN_SRC yaml :tangle output/dynamodb.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
 ---
 # Use postgres/example user/password credentials
@@ -102,7 +102,7 @@ RUN ros install lisp-unit lisp-unit2 rove cl-ppcre
 
 #+END_SRC
 ** Jetty
-#+BEGIN_SRC yaml :tangle jetty/docker-compose.yml
+#+BEGIN_SRC yaml :tangle output/jetty.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
 ---
 version: '3.1'
@@ -126,7 +126,7 @@ networks:
 
 #+END_SRC
 ** PostgreSQL
-#+BEGIN_SRC yaml :tangle postgres/docker-compose.yml
+#+BEGIN_SRC yaml :tangle output/postgres.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
 ---
 # Use postgres/example user/password credentials
@@ -150,7 +150,7 @@ networks:
 
 #+END_SRC
 ** Redis
-#+BEGIN_SRC yaml :tangle redis/docker-compose.yml
+#+BEGIN_SRC yaml :tangle output/redis.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
 ---
 version: '3.1'
@@ -170,13 +170,34 @@ networks:
 
 #+END_SRC
 ** Samba
-#+BEGIN_SRC yaml :tangle samba/docker-compose.yml
+#+BEGIN_SRC yaml :tangle output/samba.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
+# Need to define USER and UPASS before running docker-compose
 ---
+version: '3.1'
+services:
+  samba:
+    image: dperson/samba
+    restart: always
+    container_name: samba
+    hostname: origensmb
+    ports:
+      - 137:137/udp
+      - 138:138/udp
+      - 139:139
+      - 445:445/udp
+    volumes:
+      - /home/thawes/Documents:/shares/Documents
+      - /home/thawes/Games:/shares/Games
+    command: "-n -W -w \"origensmb\" -u \"${SAMBA_USER};${SAMBA_PASS};1000;thawes;1000\" -s \"Documents;/shares/Documents;yes;no;no;${SAMBA_USER}\" -s \"Games;/shares/Games;yes;no;no;${SAMBA_USER}\""
+    networks:
+      bridge:
 
+networks:
+  bridge:
 #+END_SRC
 ** Wordpress
-#+BEGIN_SRC yaml :tangle wordpress/stack.yml
+#+BEGIN_SRC yaml :tangle output/wordpress.yml
 # -*- mode: Yaml; eval: '(ansible 1)' -*-
 ---
 version: '3.1'

@@ -5,3 +5,6 @@
 
 # Vi(m) artifacts
 *.swp
+
+# Tangle artifacts
+output/
