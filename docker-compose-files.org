@@ -191,10 +191,16 @@ services:
       - /home/thawes/Games:/shares/Games
     command: "-n -W -w \"origensmb\" -u \"${SAMBA_USER};${SAMBA_PASS};1000;thawes;1000\" -s \"Documents;/shares/Documents;yes;no;no;${SAMBA_USER}\" -s \"Games;/shares/Games;yes;no;no;${SAMBA_USER}\""
     networks:
-      bridge:
+      staticnet:
+        ipv4_address: 172.28.1.2
 
 networks:
-  bridge:
+  staticnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+
 #+END_SRC
 ** Wordpress
 #+BEGIN_SRC yaml :tangle output/wordpress.yml
