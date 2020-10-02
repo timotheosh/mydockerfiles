@@ -64,16 +64,23 @@ networks:
 version: '3.1'
 
 services:
-
   dynamodb:
     image: amazon/dynamodb-local
     restart: always
     container_name: dynamodb-local
+    entrypoint: java
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    volumes:
+      - dynamodb-data:/data
     ports:
       - 8000:8000
     networks:
       bridge:
 
+volumes:
+  dynamodb-data:
+    external: true
+    
 networks:
   bridge:
 
@@ -100,6 +107,36 @@ RUN ros init
 RUN ros install sbcl/2.0.1
 RUN ros install lisp-unit lisp-unit2 rove cl-ppcre
 
+#+END_SRC
+** Jenkins
+#+BEGIN_SRC yaml :tangle output/jenkins.yml
+# -*- mode: Yaml; eval: '(ansible 1)' -*-
+---
+version: '3.1'
+
+services:
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    restart: always
+    container_name: jenkins
+    ports:
+      - 8181:8080
+      - 50000:50000
+      - 55000:55000
+    volumes:
+            - jenkins_home:/var/jenkins_home
+    networks:
+      bridge:
+
+volumes:
+  jenkins_home:
+    external: true
+
+networks:
+  bridge:
+
+#+END_SRC
 #+END_SRC
 ** Jetty
 #+BEGIN_SRC yaml :tangle output/jetty.yml
